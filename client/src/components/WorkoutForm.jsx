@@ -1,16 +1,16 @@
-import { useState } from "react";
 import axios from "axios";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { createWorkout } from "../slices/workoutSlice";
 
-function WorkoutForm({ setWorkouts, workouts }) {
+function WorkoutForm() {
+  const dispatch = useDispatch();
+
   const [formValue, setFormValue] = useState({
     title: "",
     load: 0,
     reps: 0,
   });
-
-  function handleChange(e) {
-    setFormValue({ ...formValue, [e.target.name]: e.target.value });
-  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -18,8 +18,12 @@ function WorkoutForm({ setWorkouts, workouts }) {
       ...formValue,
     });
     const workout = await res.data;
-    setWorkouts([...workouts, workout]);
+    dispatch(createWorkout(workout));
     setFormValue({ title: "", load: 0, reps: 0 });
+  }
+
+  function handleChange(e) {
+    setFormValue({ ...formValue, [e.target.name]: e.target.value });
   }
 
   return (

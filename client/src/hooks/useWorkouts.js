@@ -1,17 +1,19 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { setWorkouts } from "../slices/workoutSlice";
 
 export const useWorkouts = () => {
-  const [workouts, setWorkouts] = useState([]);
+  const { workouts } = useSelector((state) => state.workout);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchWorkouts = async () => {
       const res = await axios.get("http://localhost:5000/api/workouts");
       const { data } = res;
-      setWorkouts(data);
+      if (res.statusText === "OK") dispatch(setWorkouts(data));
     };
     fetchWorkouts();
-  }, []);
-
-  return { workouts, setWorkouts };
+  }, [dispatch]);
+  return { workouts };
 };

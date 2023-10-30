@@ -1,6 +1,20 @@
+import axios from "axios";
 import { Trash } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { deleteWorkout } from "../slices/workoutSlice";
 
-function WorkoutDetails({ workout, handleDelete }) {
+function WorkoutDetails({ workout }) {
+  const dispatch = useDispatch();
+
+  async function handleDelete(workoutId) {
+    const res = await axios.delete(
+      `http://localhost:5000/api/workouts/${workoutId}`
+    );
+    const { data } = res;
+    console.log(data);
+    dispatch(deleteWorkout(workoutId));
+  }
+
   return (
     <div className="workout-details">
       <h4>{workout.title}</h4>
