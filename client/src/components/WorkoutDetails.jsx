@@ -1,9 +1,12 @@
 import axios from "axios";
-import { Trash } from "lucide-react";
+import { Edit, Trash } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { deleteWorkout } from "../slices/workoutSlice";
+import { useState } from "react";
+import Drawer from "./Drawer";
 
 function WorkoutDetails({ workout }) {
+  const [openDrawer, setOpenDrawer] = useState(false);
   const dispatch = useDispatch();
 
   async function handleDelete(workoutId) {
@@ -15,15 +18,30 @@ function WorkoutDetails({ workout }) {
     dispatch(deleteWorkout(workoutId));
   }
 
+  function handleToggle() {
+    setOpenDrawer(!openDrawer);
+  }
+
   return (
     <div className="workout-details">
-      <h4>{workout.title}</h4>
-      <p>Load(kg): {workout.load}</p>
-      <p>Reps: {workout.reps}</p>
-      <p>{workout.createdAt}</p>
-      <span onClick={() => handleDelete(workout._id)}>
-        <Trash />
-      </span>
+      <div>
+        <h4>{workout.title}</h4>
+        <p>Load(kg): {workout.load}</p>
+        <p>Reps: {workout.reps}</p>
+        <p>{workout.createdAt}</p>
+        <span
+          className="delete-button"
+          onClick={() => handleDelete(workout._id)}
+        >
+          <Trash />
+        </span>
+        <span className="edit-button" onClick={() => handleToggle(workout._id)}>
+          <Edit />
+        </span>
+      </div>
+      {openDrawer ? (
+        <Drawer workout={workout} handleToggle={handleToggle} />
+      ) : null}
     </div>
   );
 }

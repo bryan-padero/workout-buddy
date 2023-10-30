@@ -19,11 +19,23 @@ export const workoutSlice = createSlice({
         (workout) => workout._id !== action.payload
       );
     },
+    updateWorkout: (state, action) => {
+      state.workouts = state.workouts.map((workout) =>
+        workout._id === action.payload._id
+          ? {
+              ...workout,
+              title: action.payload.title,
+              load: action.payload.load,
+              reps: action.payload.reps,
+            }
+          : workout
+      );
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { setWorkouts, createWorkout, deleteWorkout } =
+export const { setWorkouts, createWorkout, deleteWorkout, updateWorkout } =
   workoutSlice.actions;
 
 export default workoutSlice.reducer;
