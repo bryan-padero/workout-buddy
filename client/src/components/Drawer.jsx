@@ -5,6 +5,7 @@ import { updateWorkout } from "../slices/workoutSlice";
 
 function Drawer({ workout, handleToggle }) {
   const dispatch = useDispatch();
+  const [error, setError] = useState(null);
   const [formValue, setFormValue] = useState({
     title: workout.title,
     load: workout.load,
@@ -13,15 +14,20 @@ function Drawer({ workout, handleToggle }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    const res = await axios.patch(
-      `http://localhost:5000/api/workouts/${workout._id}`,
-      {
-        ...formValue,
-      }
-    );
-    const data = await res.data;
-    if (res.statusText === "OK") dispatch(updateWorkout(data));
-    handleToggle();
+
+    try {
+      const res = await axios.patch(
+        `http://localhost:5000/api/workouts/${workout._id}`,
+        {
+          ...formValue,
+        }
+      );
+      const data = await res.data;
+      dispatch(updateWorkout(data));
+      handleToggle();
+    } catch (error) {
+      setError(error.response.data.error);
+    }
   }
 
   function handleChange(e) {
@@ -55,6 +61,7 @@ function Drawer({ workout, handleToggle }) {
         onChange={handleChange}
       />
       <button>Update Workout</button>
+      {error && <div className="error">{error}</div>}
     </form>
   );
 }

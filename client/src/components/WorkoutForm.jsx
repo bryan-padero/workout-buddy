@@ -8,18 +8,24 @@ function WorkoutForm() {
 
   const [formValue, setFormValue] = useState({
     title: "",
-    load: 0,
-    reps: 0,
+    load: "",
+    reps: "",
   });
+  const [error, setError] = useState(null);
 
   async function handleSubmit(e) {
     e.preventDefault();
-    const res = await axios.post("http://localhost:5000/api/workouts", {
-      ...formValue,
-    });
-    const workout = await res.data;
-    dispatch(createWorkout(workout));
-    setFormValue({ title: "", load: 0, reps: 0 });
+    try {
+      const res = await axios.post("http://localhost:5000/api/workouts", {
+        ...formValue,
+      });
+      const workout = await res.data;
+      dispatch(createWorkout(workout));
+      setFormValue({ title: "", load: 0, reps: 0 });
+      setError(null);
+    } catch (error) {
+      setError(error.response.data.error);
+    }
   }
 
   function handleChange(e) {
@@ -35,7 +41,6 @@ function WorkoutForm() {
         name="title"
         value={formValue.title}
         onChange={handleChange}
-        required
       />
       <label htmlFor="title">Load(in kg): </label>
       <input
@@ -44,7 +49,6 @@ function WorkoutForm() {
         name="load"
         value={formValue.load}
         onChange={handleChange}
-        required
       />
       <label htmlFor="title">Reps: </label>
       <input
@@ -53,9 +57,9 @@ function WorkoutForm() {
         name="reps"
         value={formValue.reps}
         onChange={handleChange}
-        required
       />
       <button>Add Workout</button>
+      {error && <div className="error">{error}</div>}
     </form>
   );
 }

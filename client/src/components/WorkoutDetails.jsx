@@ -3,6 +3,7 @@ import { Edit, Trash } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { deleteWorkout } from "../slices/workoutSlice";
 import { useState } from "react";
+import { formatDistanceToNow } from "date-fns";
 import Drawer from "./Drawer";
 
 function WorkoutDetails({ workout }) {
@@ -28,7 +29,11 @@ function WorkoutDetails({ workout }) {
         <h4>{workout.title}</h4>
         <p>Load(kg): {workout.load}</p>
         <p>Reps: {workout.reps}</p>
-        <p>{workout.createdAt}</p>
+        <p>
+          {formatDistanceToNow(new Date(workout.updatedAt), {
+            addSuffix: true,
+          })}
+        </p>
         <span
           className="delete-button"
           onClick={() => handleDelete(workout._id)}

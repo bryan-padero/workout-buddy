@@ -10,10 +10,12 @@ const workoutSchema = new Schema(
     reps: {
       type: Number,
       required: true,
+      min: 1,
     },
     load: {
       type: Number,
       required: true,
+      min: 1,
     },
   },
   { timestamps: true }
