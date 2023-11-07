@@ -1,15 +1,18 @@
 import "dotenv/config";
 import express from "express";
-import mongoose from "mongoose";
 import cors from "cors";
 
 // imports
 import workoutRoutes from "./routes/workoutRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
+import connectDB from "./config/db.js";
 
-const PORT = process.env.PORT;
-const MONGO_URI = process.env.MONGO_URI;
+const PORT = process.env.PORT || 5000;
+
+// DB
+connectDB();
 
 // express app
 const app = express();
@@ -19,15 +22,15 @@ app.use(express.json());
 app.use(cors());
 
 // routes
-
 app.use("/api/workouts", workoutRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 
-// DB
-mongoose.set("runValidators", true); // to enable validators on update
-mongoose.connect(MONGO_URI).then(
-  app.listen(PORT, () => {
-    console.log(`Server Port: ${PORT}`);
-  })
-);
+// error middleware
+app.use(notFound);
+app.use(errorHandler);
+
+// app listen
+app.listen(PORT, () => {
+  console.log(`Server Port: ${PORT}`);
+});
