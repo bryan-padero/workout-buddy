@@ -1,4 +1,6 @@
 import express from "express";
+
+// imports
 import {
   createUser,
   deleteUser,
@@ -6,13 +8,14 @@ import {
   getSingleUser,
   updateUser,
 } from "../controllers/userControllers.js";
+import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.get("/", getAllUsers);
-router.get("/:userId", getSingleUser);
-router.post("/", createUser);
-router.patch("/:userId", updateUser);
-router.delete("/:userId", deleteUser);
+router.get("/", protect, getAllUsers);
+router.get("/:userId", protect, getSingleUser);
+router.post("/", protect, createUser);
+router.patch("/:userId", protect, updateUser);
+router.delete("/:userId", protect, deleteUser);
 
 export default router;

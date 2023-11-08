@@ -1,13 +1,8 @@
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
 
 // imports
 import User from "../models/userModel.js";
-
-const createToken = (userId) => {
-  return jwt.sign({ _id: userId }, process.env.JWT_SECRET, { expiresIn: "3d" });
-};
+import generateToken from "../utils/generateToken.js";
 
 export const signupUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
@@ -22,6 +17,7 @@ export const signupUser = asyncHandler(async (req, res) => {
   const user = await User.create({ name, email, password });
 
   if (user) {
+    generateToken(res, user._id);
     res.status(201).json({
       _id: user._id,
       name: user.name,
@@ -38,26 +34,54 @@ export const loginUser = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({ email });
 
-  if (!user) {
-    res.status(400);
-    throw new Error("User not found");
+  if (user && (await user.matchPassword(password))) {
+    generateToken(res, user._id);
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+    });
+  } else {
+    res.status(401);
+    throw new Error("Invalid email or password");
   }
-
-  const isCorrect = bcrypt.compareSync(password, user.password);
-  if (!isCorrect) {
-    res.status(404);
-    throw new Error("Wrong username or password");
-  }
-
-  // create token
-  const token = createToken(user._id);
-  res.status(200).json({ email, token });
 });
 
-export const logoutUser = async (req, res) => {
-  try {
-    console.log("Logout");
-  } catch (error) {
-    res.status(400).send({ error: error.message });
+export const logoutUser = asyncHandler(async (req, res) => {
+  res.cookie("jwt", "", {
+    httpOnly: true,
+    expires: new Date(0),
+  });
+  res.status(200).json({ message: "User logged out!" });
+});
+
+export const getUserProfile = asyncHandler(async (req, res) => {
+  const user = {
+    _id: req.user._id,
+    name: req.user.name,
+    email: req.user.email,
+  };
+  res.status(200).json(user);
+});
+export const updateUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  if (user) {
+    user.name = req.body.name || user.name;
+    user.email = req.body.email || user.email;
+
+    if (req.body.password) {
+      user.password = req.body.password;
+    }
+
+    const updatedUser = await user.save();
+
+    res.status(200).json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+    });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
   }
-};
+});
