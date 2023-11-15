@@ -32,6 +32,17 @@ header a {
   margin: 0 auto;
 }
 
+.auth-page {
+  max-width: 1400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.auth-page form {
+  width: 30%;
+}
+
 /* homepage */
 .home {
   display: grid;

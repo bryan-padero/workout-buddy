@@ -29,7 +29,7 @@ function WorkoutForm() {
   }
 
   function handleChange(e) {
-    setFormValue({ ...formValue, [e.target.name]: e.target.value });
+    setFormValue({ ...formValue, [e.target.name]: e.target.value });  
   }
 
   return (
